@@ -1,9 +1,17 @@
+import BuyTicket from '@/components/BuyTicket'
+import Ticket from '@/components/Tickets'
 import { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { BsDot } from 'react-icons/bs'
 import { FaEthereum } from 'react-icons/fa'
+import { RiShieldUserLine } from 'react-icons/ri'
 
 const Page: NextPage = () => {
+  const router = useRouter()
+  const { id } = router.query
+
   return (
     <div>
       <Head>
@@ -49,19 +57,50 @@ const Page: NextPage = () => {
               >
                 Buy Ticket
               </button>
+            </div>
 
+            <h4 className="text-xl mt-10 mb-5">Recent Purchase</h4>
+            {Array(5)
+              .fill()
+              .map((ticket, i) => (
+                <div
+                  className={`flex justify-start items-between space-x-4 w-full p-5 border-b
+                  border-gray-200 bg-white shadow-md`}
+                >
+                  <div className="flex justify-start items-center space-x-2">
+                    <div className="bg-gray-200 rounded-full p-2">
+                      <RiShieldUserLine size={23} />
+                    </div>
+                    <p className="font-semibold">0x70...79C8</p>
+                  </div>
+
+                  <div className="flex justify-end items-center w-full">
+                    <div className="flex justify-start items-center">
+                      <span className="flex items-center">
+                        <FaEthereum /> <span>10</span>
+                      </span>
+                      <BsDot size={30} className="text-gray-300" />
+                      <span className="text-gray-500">25 d</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+            <div className="flex justify-start items-center space-x-4 my-8">
               <Link
-                href={'/'}
+                href={'/events/tickets/' + id}
                 className="bg-[#010125] p-2 rounded-full py-3 px-10
                 text-white border hover:bg-transparent hover:text-[#010125]
                 hover:border-[#010125] duration-300 transition-all"
               >
-                Back
+                All Sales
               </Link>
             </div>
           </div>
         </main>
       </section>
+
+      <BuyTicket />
     </div>
   )
 }
