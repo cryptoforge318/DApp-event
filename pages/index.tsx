@@ -1,9 +1,11 @@
 import EventList from '@/components/EventList'
 import Hero from '@/components/Hero'
+import { generateEventData } from '@/utils/fakeData'
+import { EventStruct } from '@/utils/type.dt'
 import { NextPage } from 'next'
 import Head from 'next/head'
 
-const Page: NextPage = () => {
+const Page: NextPage<{ eventsData: EventStruct[] }> = ({ eventsData }) => {
   return (
     <div>
       <Head>
@@ -12,13 +14,15 @@ const Page: NextPage = () => {
       </Head>
 
       <Hero />
-      <EventList />
+      <EventList events={eventsData} />
 
       <div className="mt-10 h-20 "></div>
 
       <div className="w-full flex justify-center items-center">
-        <button className="bg-orange-500 shadow-md rounded-full py-3 px-4
-        text-white duration-300 transition-all">
+        <button
+          className="bg-orange-500 shadow-md rounded-full py-3 px-4
+        text-white duration-300 transition-all"
+        >
           {' '}
           Load More
         </button>
@@ -28,3 +32,10 @@ const Page: NextPage = () => {
 }
 
 export default Page
+
+export const getServerSideProps = async () => {
+  const eventsData: EventStruct[] = generateEventData(10)
+  return {
+    props: { eventsData: JSON.parse(JSON.stringify(eventsData)) },
+  }
+}
