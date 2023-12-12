@@ -1,11 +1,13 @@
 import BuyTicket from '@/components/BuyTicket'
 import Ticket from '@/components/Tickets'
+import { generateTicketData } from '@/utils/fakeData'
+import { TicketStruct } from '@/utils/type.dt'
 import { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-const Page: NextPage = () => {
+const Page: NextPage<{ ticketsData: TicketStruct[] }> = ({ ticketsData }) => {
   const router = useRouter()
   const { id } = router.query
 
@@ -17,7 +19,7 @@ const Page: NextPage = () => {
       </Head>
 
       <section className="flex justify-center items-center flex-col flex-wrap p-6">
-        <Ticket />
+        <Ticket tickets={ticketsData} />
 
         <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start space-x-2">
           <button
@@ -45,3 +47,13 @@ const Page: NextPage = () => {
 }
 
 export default Page
+
+export const getServerSideProps = async () => {
+  const ticketsData: TicketStruct[] = generateTicketData(6)
+
+  return {
+    props: {
+      ticketsData: JSON.parse(JSON.stringify(ticketsData)),
+    },
+  }
+}
