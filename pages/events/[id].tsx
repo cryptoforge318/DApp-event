@@ -1,12 +1,11 @@
 import BuyTicket from '@/components/BuyTicket'
-import Ticket from '@/components/Tickets'
+import Identicon from 'react-identicons'
 import { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { BsDot } from 'react-icons/bs'
 import { FaEthereum } from 'react-icons/fa'
-import { RiShieldUserLine } from 'react-icons/ri'
 
 const Page: NextPage = () => {
   const router = useRouter()
@@ -65,12 +64,14 @@ const Page: NextPage = () => {
               .map((ticket, i) => (
                 <div
                   className={`flex justify-start items-between space-x-4 w-full p-5 border-b
-                  border-gray-200 bg-white shadow-md`}
+                  border-gray-200`}
                 >
                   <div className="flex justify-start items-center space-x-2">
-                    <div className="bg-gray-200 rounded-full p-2">
-                      <RiShieldUserLine size={23} />
-                    </div>
+                    <Identicon
+                      className="rounded-full overflow-hidden shadow-md"
+                      size={30}
+                      string={'account' + i}
+                    />
                     <p className="font-semibold">0x70...79C8</p>
                   </div>
 
@@ -79,7 +80,7 @@ const Page: NextPage = () => {
                       <span className="flex items-center">
                         <FaEthereum /> <span>10</span>
                       </span>
-                      <BsDot size={30} className="text-gray-300" />
+                      <BsDot size={30} />
                       <span className="text-gray-500">25 d</span>
                     </div>
                   </div>
