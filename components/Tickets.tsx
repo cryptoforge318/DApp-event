@@ -8,6 +8,7 @@ const Ticket: React.FC = () => {
       className="lg:w-1/3 w-full mx-auto flex justify-start items-center
     flex-col sm:space-x-3 bg-white shadow-md overflow-hidden"
     >
+      <h4 className="text-xl mt-10 mb-5">All Purchase (156)</h4>
       {Array(5)
         .fill()
         .map((ticket, i) => (
