@@ -58,7 +58,7 @@ const Page: NextPage = () => {
               </button>
             </div>
 
-            <h4 className="text-xl mt-10 mb-5">Recent Purchase</h4>
+            <h4 className="text-xl mt-10 mb-5">Recent Purchase (156)</h4>
             {Array(5)
               .fill()
               .map((ticket, i) => (
