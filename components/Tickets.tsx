@@ -1,6 +1,6 @@
 import { BsDot } from 'react-icons/bs'
 import { FaEthereum } from 'react-icons/fa'
-import { RiShieldUserLine } from 'react-icons/ri'
+import Identicon from 'react-identicons'
 
 const Ticket: React.FC = () => {
   return (
@@ -15,9 +15,11 @@ const Ticket: React.FC = () => {
             className={`flex justify-start items-between space-x-4 w-full p-5 border-b border-gray-200`}
           >
             <div className="flex justify-start items-center space-x-2">
-              <div className="bg-gray-200 rounded-full p-2">
-                <RiShieldUserLine size={23} />
-              </div>
+              <Identicon
+                className="rounded-full overflow-hidden shadow-md"
+                size={30}
+                string={'account' + i}
+              />
               <p className="font-semibold">0x70...79C8</p>
             </div>
 
