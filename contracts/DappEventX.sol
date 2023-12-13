@@ -164,14 +164,13 @@ contract DappEventX is Ownable, ReentrancyGuard, ERC721 {
     }
   }
 
-  function getEvent(uint256 eventId) public view returns (EventStruct memory) {
+  function getSingleEvent(uint256 eventId) public view returns (EventStruct memory) {
     return events[eventId];
   }
 
   function buyTickets(uint256 eventId, uint256 numOfticket) public payable {
     require(eventExists[eventId], 'Event not found');
     require(msg.value >= events[eventId].ticketCost * numOfticket, 'Insufficient amount');
-    require(currentTime() < events[eventId].startsAt, 'Event already started');
     require(numOfticket > 0, 'NumOfticket must be greater than zero');
     require(
       events[eventId].seats + numOfticket <= events[eventId].capacity,
@@ -188,7 +187,12 @@ contract DappEventX is Ownable, ReentrancyGuard, ERC721 {
       tickets[eventId].push(ticket);
     }
 
+    events[eventId].seats += numOfticket;
     balance += msg.value;
+  }
+
+  function getTickets(uint256 eventId) public view returns (TicketStruct[] memory Tickets) {
+    return tickets[eventId];
   }
 
   function refundTickets(uint256 eventId) internal returns (bool) {
@@ -205,16 +209,17 @@ contract DappEventX is Ownable, ReentrancyGuard, ERC721 {
   function payout(uint256 eventId) public {
     require(eventExists[eventId], 'Event not found');
     require(!events[eventId].paidOut, 'Event already paid out');
-    require(currentTime() > events[eventId].endsAt, 'Event still ongoing');
+    // require(currentTime() > events[eventId].endsAt, 'Event still ongoing');
     require(events[eventId].owner == msg.sender || msg.sender == owner(), 'Unauthorized entity');
     require(mintTickets(eventId), 'Event failed to mint');
 
-    uint256 revenue = events[eventId].ticketCost * tickets[eventId].length;
+    uint256 revenue = events[eventId].ticketCost * events[eventId].seats;
     uint256 feePct = (revenue * servicePct) / 100;
 
     payTo(events[eventId].owner, revenue - feePct);
     payTo(owner(), feePct);
 
+    events[eventId].paidOut = true;
     balance -= revenue;
   }
 
