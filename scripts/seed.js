@@ -9,6 +9,7 @@ const generateEventData = (count) => {
   const events = []
 
   for (let i = 0; i < count; i++) {
+    const startDate = new Date(Date.now() + 10 * 60 * 1000).getTime()
     const event = {
       id: i + 1,
       title: faker.lorem.words(5),
@@ -21,8 +22,8 @@ const generateEventData = (count) => {
       sales: faker.number.int({ min: 1, max: 20 }),
       capacity: faker.number.int({ min: 20, max: 40 }),
       ticketCost: faker.number.float({ min: 0.01, max: 0.1 }),
-      startsAt: faker.date.future().getTime(),
-      endsAt: faker.date.past().getTime(),
+      startsAt: startDate,
+      endsAt: new Date(startDate + 10 * 24 * 60 * 60 * 1000).getTime(),
       timestamp: faker.date.past().getTime(),
       deleted: faker.datatype.boolean(),
       paidOut: faker.datatype.boolean(),
@@ -82,7 +83,7 @@ async function main() {
     //     Array(randomCount)
     //       .fill()
     //       .forEach(async (_, j) => {
-    //         await buyTickets(dappEventXContract, i + 1, randomCount)
+    //         await buyTickets(dappEventXContract, i + 1, 1)
     //       })
     //   })
 

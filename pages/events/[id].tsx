@@ -1,6 +1,6 @@
 import BuyTicket from '@/components/BuyTicket'
 import Identicon from 'react-identicons'
-import { NextPage } from 'next'
+import { GetServerSidePropsContext, NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,6 +10,7 @@ import { generateEventData, generateTicketData } from '@/utils/fakeData'
 import { EventStruct, TicketStruct } from '@/utils/type.dt'
 import { getExpiryDate, truncate } from '@/utils/helper'
 import Moment from 'react-moment'
+import { getEvent, getTickets } from '@/services/blockchain'
 
 interface ComponentProps {
   eventData: EventStruct
@@ -50,8 +51,19 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
                 <FaEthereum />
                 <p className=" font-bold">{eventData.ticketCost.toFixed(2)} ETH </p>
               </div>
-              <div className=" text-red-500 text-lg font-bold mx-4">
-                <p>{getExpiryDate(eventData.startsAt)}</p>
+              <span className="pl-4">|</span>
+              <div className="text-lg mx-4">
+                {eventData.startsAt > Date.now() && (
+                  <p className="text-gray-600">
+                    Starts in {getExpiryDate(eventData.startsAt)} days
+                  </p>
+                )}
+
+                {Date.now() > eventData.startsAt && (
+                  <p className="text-orange-500">Ends in {getExpiryDate(eventData.endsAt)} days</p>
+                )}
+
+                {Date.now() > eventData.endsAt && <p className="text-red-500">Expired</p>}
               </div>
             </div>
             <div className="flex justify-start items-center space-x-4 my-8">
@@ -65,7 +77,7 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
             </div>
 
             <h4 className="text-xl mt-10 mb-5">Recent Purchase ({ticketsData.length})</h4>
-            {ticketsData.map((ticket, i) => (
+            {ticketsData.slice(0, 4).map((ticket, i) => (
               <div
                 className="flex justify-start items-between space-x-4 w-full py-5 
                 border-b border-gray-200"
@@ -93,7 +105,7 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
                       <FaEthereum /> <span>{ticket.ticketCost.toFixed(2)}</span>
                     </span>
                     <BsDot size={30} />
-                    <Moment className="text-gray-500" toNow>
+                    <Moment className="text-gray-500" fromNow>
                       {ticket.timestamp}
                     </Moment>
                   </div>
@@ -122,9 +134,10 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
 
 export default Page
 
-export const getServerSideProps = async () => {
-  const eventData: EventStruct = generateEventData(1)[0]
-  const ticketsData: TicketStruct[] = generateTicketData(6)
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const { id } = context.query
+  const eventData: EventStruct = await getEvent(Number(id))
+  const ticketsData: TicketStruct[] = await getTickets(Number(id))
 
   return {
     props: {

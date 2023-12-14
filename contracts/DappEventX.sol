@@ -66,7 +66,7 @@ contract DappEventX is Ownable, ReentrancyGuard, ERC721 {
     require(bytes(description).length > 0, 'Description cannot be empty');
     require(bytes(imageUrl).length > 0, 'ImageUrl cannot be empty');
     require(startsAt > 0, 'Start date must be greater than zero');
-    require(startsAt > endsAt, 'Start date must be greater than end date');
+    require(endsAt > startsAt, 'End date must be greater than start date');
 
     _totalEvents.increment();
     EventStruct memory eventX;
@@ -103,8 +103,8 @@ contract DappEventX is Ownable, ReentrancyGuard, ERC721 {
     require(bytes(title).length > 0, 'Title cannot be empty');
     require(bytes(description).length > 0, 'Description cannot be empty');
     require(bytes(imageUrl).length > 0, 'ImageUrl cannot be empty');
-    require(endsAt > startsAt, 'End date must be greater than start date');
     require(startsAt > 0, 'Start date must be greater than zero');
+    require(endsAt > startsAt, 'End date must be greater than start date');
 
     events[eventId].title = title;
     events[eventId].description = description;
