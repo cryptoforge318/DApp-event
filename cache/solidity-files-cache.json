@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/daltonic/Sites/dappEventX/contracts/DappEventX.sol": {
-      "lastModificationDate": 1702491675587,
-      "contentHash": "3864fac29b4ea4d3a018540dd3ad189a",
+      "lastModificationDate": 1702545034334,
+      "contentHash": "a380ed6dee344d5c91734e90a9bc792d",
       "sourceName": "contracts/DappEventX.sol",
       "solcConfig": {
         "version": "0.8.17",
