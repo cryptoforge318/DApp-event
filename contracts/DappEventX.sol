@@ -66,7 +66,7 @@ contract DappEventX is Ownable, ReentrancyGuard, ERC721 {
     require(bytes(description).length > 0, 'Description cannot be empty');
     require(bytes(imageUrl).length > 0, 'ImageUrl cannot be empty');
     require(startsAt > 0, 'Start date must be greater than zero');
-    require(endsAt > startsAt, 'End date must be greater than start date');
+    require(startsAt > endsAt, 'Start date must be greater than end date');
 
     _totalEvents.increment();
     EventStruct memory eventX;
@@ -209,7 +209,7 @@ contract DappEventX is Ownable, ReentrancyGuard, ERC721 {
   function payout(uint256 eventId) public {
     require(eventExists[eventId], 'Event not found');
     require(!events[eventId].paidOut, 'Event already paid out');
-    // require(currentTime() > events[eventId].endsAt, 'Event still ongoing');
+    require(currentTime() > events[eventId].endsAt, 'Event still ongoing'); // disable while testing
     require(events[eventId].owner == msg.sender || msg.sender == owner(), 'Unauthorized entity');
     require(mintTickets(eventId), 'Event failed to mint');
 

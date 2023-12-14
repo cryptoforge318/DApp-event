@@ -15,7 +15,7 @@ export const generateEventData = (count: number): EventStruct[] => {
         prefix: '0x',
       }),
       sales: faker.number.int({ min: 1, max: 20 }),
-      participants: faker.number.int({ min: 20, max: 40 }),
+      capacity: faker.number.int({ min: 20, max: 40 }),
       ticketCost: faker.number.float({ min: 0.01, max: 0.1 }),
       startsAt: faker.date.future().getTime(),
       endsAt: faker.date.past().getTime(),

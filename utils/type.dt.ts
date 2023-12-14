@@ -13,7 +13,7 @@ export interface EventStruct {
   owner: string
   sales: number
   ticketCost: number
-  participants: number
+  capacity: number
   startsAt: number
   endsAt: number
   timestamp: number
