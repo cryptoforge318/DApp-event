@@ -5,7 +5,7 @@ export function getExpiryDate(timestamp: number) {
   const diffInMilliseconds = timestamp - currentDate
   const diffInDays = Math.ceil(diffInMilliseconds / (1000 * 60 * 60 * 24))
 
-  return `Expires in ${diffInDays} days`
+  return diffInDays
 }
 
 export const truncate = ({ text, startChars, endChars, maxLength }: TruncateParams): string => {

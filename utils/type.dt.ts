@@ -14,11 +14,14 @@ export interface EventStruct {
   sales: number
   ticketCost: number
   capacity: number
+  seats: number
   startsAt: number
   endsAt: number
   timestamp: number
   deleted: boolean
   paidOut: boolean
+  refunded: boolean
+  minted: boolean
 }
 
 export interface TicketStruct {
@@ -27,6 +30,6 @@ export interface TicketStruct {
   owner: string
   ticketCost: number
   timestamp: number
-  deleted: boolean
   refunded: boolean
+  minted: boolean
 }

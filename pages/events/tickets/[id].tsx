@@ -1,8 +1,9 @@
 import BuyTicket from '@/components/BuyTicket'
 import Ticket from '@/components/Tickets'
+import { getTickets } from '@/services/blockchain'
 import { generateTicketData } from '@/utils/fakeData'
 import { TicketStruct } from '@/utils/type.dt'
-import { NextPage } from 'next'
+import { GetServerSidePropsContext, NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -48,8 +49,9 @@ const Page: NextPage<{ ticketsData: TicketStruct[] }> = ({ ticketsData }) => {
 
 export default Page
 
-export const getServerSideProps = async () => {
-  const ticketsData: TicketStruct[] = generateTicketData(6)
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const { id } = context.query
+  const ticketsData: TicketStruct[] = await getTickets(Number(id))
 
   return {
     props: {

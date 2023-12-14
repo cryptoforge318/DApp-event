@@ -1,3 +1,4 @@
+import { truncate } from '@/utils/helper'
 import { EventStruct } from '@/utils/type.dt'
 import Link from 'next/link'
 import React from 'react'
@@ -24,8 +25,22 @@ const Card: React.FC<{ event: EventStruct }> = ({ event }) => {
       <img src={event.imageUrl} alt={event.title} />
 
       <div className="p-4">
-        <h3 className="text-gray-900 text-lg font-bold mb-2 capitalize">{event.title}</h3>
-        <p>{event.description}</p>
+        <h3 className="text-gray-900 text-lg font-bold mb-2 capitalize">
+          {truncate({
+            text: event.title,
+            startChars: 45,
+            endChars: 0,
+            maxLength: 48,
+          })}
+        </h3>
+        <p>
+          {truncate({
+            text: event.description,
+            startChars: 100,
+            endChars: 0,
+            maxLength: 103,
+          })}
+        </p>
         <div className="flex justify-between items-center mt-3">
           <div className="flex justify-start items-center">
             <FaEthereum />
