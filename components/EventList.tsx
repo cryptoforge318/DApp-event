@@ -21,8 +21,19 @@ const EventList: React.FC<{ events: EventStruct[] }> = ({ events }) => {
 
 const Card: React.FC<{ event: EventStruct }> = ({ event }) => {
   return (
-    <div className="rounded-lg shadow-lg bg-white max-w-xs">
-      <img src={event.imageUrl} alt={event.title} className='h-44 w-full object-cover' />
+    <Link href={'/events/' + event.id} className="rounded-lg shadow-lg bg-white max-w-xs">
+      <div className="relative">
+        <img src={event.imageUrl} alt={event.title} className="h-44 w-full object-cover" />
+        {!event.minted ? (
+          <span className="bg-orange-600 text-white absolute right-3 top-3 rounded-xl px-4">
+            Open
+          </span>
+        ) : (
+          <span className="bg-cyan-600 text-white absolute right-3 top-3 rounded-xl px-4">
+            Minted
+          </span>
+        )}
+      </div>
 
       <div className="p-4">
         <h3 className="text-gray-900 text-lg font-bold mb-2 capitalize">
@@ -48,16 +59,9 @@ const Card: React.FC<{ event: EventStruct }> = ({ event }) => {
               {event.ticketCost.toFixed(2)} ETH
             </p>
           </div>
-
-          <Link
-            href={'/events/' + event.id}
-            className="bg-[#010125] shadow-md rounded-full py-1.5 px-3 text-white"
-          >
-            Details
-          </Link>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 

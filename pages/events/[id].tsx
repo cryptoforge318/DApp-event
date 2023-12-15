@@ -4,18 +4,16 @@ import Moment from 'react-moment'
 import BuyTicket from '@/components/BuyTicket'
 import Identicon from 'react-identicons'
 import { GetServerSidePropsContext, NextPage } from 'next'
-import { useRouter } from 'next/router'
 import { BsDot } from 'react-icons/bs'
-import { FaEthereum, FaRegTrashAlt } from 'react-icons/fa'
-import { deleteEvent, getEvent, getTickets } from '@/services/blockchain'
+import { FaEthereum } from 'react-icons/fa'
+import { getEvent, getTickets } from '@/services/blockchain'
 import { EventStruct, RootState, TicketStruct } from '@/utils/type.dt'
-import { GrEdit } from 'react-icons/gr'
 import { calculateDateDifference, formatDate, getExpiryDate, truncate } from '@/utils/helper'
 import { useAccount } from 'wagmi'
-import { toast } from 'react-toastify'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { globalActions } from '@/store/globalSlices'
+import EventActions from '@/components/EventAction'
 
 interface ComponentProps {
   eventData: EventStruct
@@ -25,7 +23,6 @@ interface ComponentProps {
 const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
   const dispatch = useDispatch()
   const { address } = useAccount()
-  const router = useRouter()
 
   const { event, tickets } = useSelector((states: RootState) => states.globalStates)
   const { setEvent, setTickets, setTicketModal } = globalActions
@@ -34,30 +31,6 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
     dispatch(setEvent(eventData))
     dispatch(setTickets(ticketsData))
   }, [dispatch, setEvent, eventData, setTickets, ticketsData])
-
-  const handleDelete = async () => {
-    if (!address) return toast.warn('Connect wallet first')
-
-    const userConfirmed = window.confirm('Are you sure you want to delete this event?')
-    if (!userConfirmed) return
-
-    await toast.promise(
-      new Promise(async (resolve, reject) => {
-        deleteEvent(eventData.id)
-          .then((tx) => {
-            console.log(tx)
-            router.push('/')
-            resolve(tx)
-          })
-          .catch((error) => reject(error))
-      }),
-      {
-        pending: 'Approve transaction...',
-        success: 'Event deleted successful 👌',
-        error: 'Encountered error 🤯',
-      }
-    )
-  }
 
   return event ? (
     <div>
@@ -75,25 +48,40 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
             <img src={event.imageUrl} alt={event.title} className="w-full h-[500px] object-cover" />
           </div>
           <div className="w-full">
-            <h3 className="text-gray-900 text-3xl font-bold mt-4 capitalize ">{event.title}</h3>
-            <small className="font-medium text-sm">
-              {calculateDateDifference(event.startsAt, event.endsAt)} event |{' '}
-              {event.capacity - event.seats} seat(s) left
-            </small>
+            <div className="flex flex-wrap justify-start items-center space-x-2 mt-4">
+              <h3 className="text-gray-900 text-3xl font-bold capitalize ">{event.title}</h3>
+
+              {!event.minted ? (
+                <span className="bg-orange-600 text-white rounded-xl px-4">Open</span>
+              ) : (
+                <span className="bg-cyan-600 text-white rounded-xl px-4">Minted</span>
+              )}
+            </div>
+            <div className="flex justify-start items-center space-x-1 font-medium text-sm">
+              {Date.now() < event.endsAt && (
+                <>
+                  <span>{calculateDateDifference(event.endsAt, Date.now())} remaining</span>
+                  <BsDot size={30} />
+                </>
+              )}
+              <span>{event.capacity - event.seats} seat(s) left</span>
+            </div>
             <p className="mt-4">{event.description}</p>
 
-            <div className="flex justify-start items-center my-4 ">
+            <div className="flex flex-col sm:flex-row justify-start sm:items-center my-4">
               <div className="flex justify-start items-center">
                 <FaEthereum />
                 <p className=" font-bold">{event.ticketCost.toFixed(2)} ETH </p>
               </div>
-              <span className="pl-4">|</span>
-              <div className="text-lg mx-4">
+
+              <span className="pl-4 hidden sm:flex">|</span>
+
+              <div className="text-sm sm:text-lg sm:mx-4 mt-2 sm:mt-0">
                 {event.startsAt > Date.now() && (
                   <p className="text-gray-600">Starts on {formatDate(event.startsAt)}</p>
                 )}
 
-                {Date.now() > event.startsAt && (
+                {Date.now() > event.startsAt && getExpiryDate(event.endsAt) !== 0 && (
                   <p className="text-orange-500">Ends in {getExpiryDate(event.endsAt)} days</p>
                 )}
 
@@ -102,38 +90,18 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
             </div>
 
             <div className="flex justify-start items-center space-x-4 my-8">
-              <button
-                className="bg-orange-500 p-2 rounded-full py-3 px-10
+              {event.endsAt > Date.now() && (
+                <button
+                  className="bg-orange-500 p-2 rounded-full py-3 px-10
                 text-white hover:bg-transparent border hover:text-orange-500
                 hover:border-orange-500 duration-300 transition-all"
-                onClick={() => dispatch(setTicketModal('scale-100'))}
-              >
-                Buy Ticket
-              </button>
-
-              {address === event.owner && (
-                <>
-                  <Link
-                    href={'/events/edit/' + event.id}
-                    className="bg-transparent p-2 rounded-full py-3 px-5
-                    text-black hover:bg-orange-500 hover:text-white
-                    duration-300 transition-all flex justify-start items-center
-                    space-x-2 border border-black hover:border-orange-500"
-                  >
-                    <GrEdit /> <span>Edit</span>
-                  </Link>
-
-                  <button
-                    className="bg-transparent p-2 rounded-full py-3 px-5
-                    text-red-500 hover:bg-orange-500 hover:text-white
-                    duration-300 transition-all flex justify-start items-center
-                    space-x-2 border border-red-500 hover:border-orange-500"
-                    onClick={handleDelete}
-                  >
-                    <FaRegTrashAlt /> <span>Delete</span>
-                  </button>
-                </>
+                  onClick={() => dispatch(setTicketModal('scale-100'))}
+                >
+                  Buy Ticket
+                </button>
               )}
+
+              {address === event.owner && <EventActions event={event} />}
             </div>
 
             <h4 className="text-xl mt-10 mb-5">Recent Purchase ({tickets.length})</h4>
