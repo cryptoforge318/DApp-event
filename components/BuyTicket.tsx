@@ -1,16 +1,12 @@
-import { globalActions } from '@/store/globalSlices'
-import { EventStruct, RootState } from '@/utils/type.dt'
+import { EventStruct } from '@/utils/type.dt'
 import React, { FormEvent, useState } from 'react'
 import { FaTimes } from 'react-icons/fa'
-import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { useAccount } from 'wagmi'
 
 const BuyTicket: React.FC<{ event: EventStruct }> = ({ event }) => {
-  const { ticketModal } = useSelector((states: RootState) => states.globalStates)
-  const { setTicketModal } = globalActions
+  const ticketModal = 'scale-0'
   const { address } = useAccount()
-  const dispatch = useDispatch()
   const [tickets, setTickets] = useState<number | string>('')
 
   const handleSubmit = async (e: FormEvent) => {
@@ -40,7 +36,6 @@ const BuyTicket: React.FC<{ event: EventStruct }> = ({ event }) => {
           <div className="flex flex-row justify-between items-center">
             <p className="font-semibold">Buy Tickets</p>
             <button
-              onClick={() => dispatch(setTicketModal('scale-0'))}
               className="border-0 bg-transparent focus:outline-none"
             >
               <FaTimes />

@@ -6,12 +6,9 @@ import Identicon from 'react-identicons'
 import { GetServerSidePropsContext, NextPage } from 'next'
 import { BsDot } from 'react-icons/bs'
 import { FaEthereum } from 'react-icons/fa'
-import { EventStruct, RootState, TicketStruct } from '@/utils/type.dt'
+import { EventStruct, TicketStruct } from '@/utils/type.dt'
 import { calculateDateDifference, formatDate, getExpiryDate, truncate } from '@/utils/helper'
 import { useAccount } from 'wagmi'
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { globalActions } from '@/store/globalSlices'
 import EventActions from '@/components/EventAction'
 import { generateEventData, generateTicketData } from '@/utils/fakeData'
 
@@ -20,17 +17,8 @@ interface ComponentProps {
   ticketsData: TicketStruct[]
 }
 
-const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
-  const dispatch = useDispatch()
+const Page: NextPage<ComponentProps> = ({ eventData: event, ticketsData: tickets }) => {
   const { address } = useAccount()
-
-  const { event, tickets } = useSelector((states: RootState) => states.globalStates)
-  const { setEvent, setTickets, setTicketModal } = globalActions
-
-  useEffect(() => {
-    dispatch(setEvent(eventData))
-    dispatch(setTickets(ticketsData))
-  }, [dispatch, setEvent, eventData, setTickets, ticketsData])
 
   return event ? (
     <div>
@@ -95,7 +83,6 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
                   className="bg-orange-500 p-2 rounded-full py-3 px-10
                 text-white hover:bg-transparent border hover:text-orange-500
                 hover:border-orange-500 duration-300 transition-all"
-                  onClick={() => dispatch(setTicketModal('scale-100'))}
                 >
                   Buy Ticket
                 </button>

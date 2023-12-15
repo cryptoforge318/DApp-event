@@ -6,8 +6,6 @@ import { useEffect, useState } from 'react'
 import { Providers } from '@/services/provider'
 import type { AppProps } from 'next/app'
 import Header from '@/components/Header'
-import { Provider } from 'react-redux'
-import { store } from '@/store'
 
 export default function App({ Component, pageProps }: AppProps) {
   const [showChild, setShowChild] = useState<boolean>(false)
@@ -21,27 +19,25 @@ export default function App({ Component, pageProps }: AppProps) {
   } else {
     return (
       <Providers pageProps={pageProps}>
-        <Provider store={store}>
-          <div className="min-h-screen bg-gray-100">
-            <Header />
-            <div className="mt-10 h-20 "></div>
-            <Component {...pageProps} />
-            <div className="mt-10 h-20 "></div>
+        <div className="min-h-screen bg-gray-100">
+          <Header />
+          <div className="mt-10 h-20 "></div>
+          <Component {...pageProps} />
+          <div className="mt-10 h-20 "></div>
 
-            <ToastContainer
-              position="bottom-center"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="dark"
-            />
-          </div>
-        </Provider>
+          <ToastContainer
+            position="bottom-center"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
+        </div>
       </Providers>
     )
   }
