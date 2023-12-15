@@ -1,21 +1,19 @@
-import { createEvent } from '@/services/blockchain'
-import { EventParams } from '@/utils/type.dt'
-import { NextPage } from 'next'
+import { getEvent, updateEvent } from '@/services/blockchain'
+import { timestampToDatetimeLocal } from '@/utils/helper'
+import { EventParams, EventStruct } from '@/utils/type.dt'
+import { GetServerSidePropsContext, NextPage } from 'next'
 import Head from 'next/head'
+import Link from 'next/link'
 import { ChangeEvent, FormEvent, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useAccount } from 'wagmi'
 
-const Page: NextPage = () => {
+const Page: NextPage<{ eventData: EventStruct }> = ({ eventData }) => {
   const { address } = useAccount()
   const [event, setEvent] = useState<EventParams>({
-    title: '',
-    imageUrl: '',
-    description: '',
-    ticketCost: '',
-    capacity: '',
-    startsAt: '',
-    endsAt: '',
+    ...eventData,
+    startsAt: timestampToDatetimeLocal(eventData.startsAt),
+    endsAt: timestampToDatetimeLocal(eventData.endsAt),
   })
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,45 +33,32 @@ const Page: NextPage = () => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        createEvent(event)
+        updateEvent(event)
           .then((tx) => {
             console.log(tx)
-            resetForm()
             resolve(tx)
           })
           .catch((error) => reject(error))
       }),
       {
         pending: 'Approve transaction...',
-        success: 'Event creation successful 👌',
+        success: 'Event updated successful 👌',
         error: 'Encountered error 🤯',
       }
     )
   }
 
-  const resetForm = () => {
-    setEvent({
-      title: '',
-      imageUrl: '',
-      description: '',
-      ticketCost: '',
-      capacity: '',
-      startsAt: '',
-      endsAt: '',
-    })
-  }
-
   return (
     <div>
       <Head>
-        <title>Event X | Create</title>
+        <title>Event X | Edit</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className="lg:w-2/3 w-full mx-auto bg-white p-5 shadow-md">
         <form onSubmit={handleSubmit} className="flex flex-col text-black">
           <div className="flex flex-row justify-between items-center mb-5">
-            <p className="font-semibold">Create Event</p>
+            <p className="font-semibold">Edit Event</p>
           </div>
 
           {event.imageUrl && (
@@ -204,15 +189,26 @@ const Page: NextPage = () => {
             ></textarea>
           </div>
 
-          <div className="mt-5">
+          <div className="flex space-x-2 mt-5">
             <button
               type="submit"
               className="bg-orange-500 p-2 rounded-full py-3 px-10
             text-white hover:bg-transparent border hover:text-orange-500
             hover:border-orange-500 duration-300 transition-all"
             >
-              Submit
+              Update
             </button>
+
+            <Link
+              href={'/events/' + event.id}
+              type="button"
+              className="bg-transparent p-2 rounded-full py-3 px-5
+              text-black hover:bg-orange-500 hover:text-white
+              duration-300 transition-all flex justify-start items-center
+              space-x-2 border border-black hover:border-orange-500"
+            >
+              Back
+            </Link>
           </div>
         </form>
       </main>
@@ -221,3 +217,14 @@ const Page: NextPage = () => {
 }
 
 export default Page
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const { id } = context.query
+  const eventData: EventStruct = await getEvent(Number(id))
+
+  return {
+    props: {
+      eventData: JSON.parse(JSON.stringify(eventData)),
+    },
+  }
+}

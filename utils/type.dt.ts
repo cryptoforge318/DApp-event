@@ -5,6 +5,17 @@ export interface TruncateParams {
   maxLength: number
 }
 
+export interface EventParams {
+  id?: number
+  title: string
+  imageUrl: string
+  description: string
+  ticketCost: number | string
+  capacity: number | string
+  startsAt: number | string
+  endsAt: number | string
+}
+
 export interface EventStruct {
   id: number
   title: string
