@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 
 const Hero: React.FC = () => {
@@ -18,13 +19,14 @@ const Hero: React.FC = () => {
             </p>
 
             <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-              <button
+              <Link
+                href={'/events/create'}
                 className="bg-[#010125] p-2 rounded-full py-3 px-4
                 text-white border hover:bg-transparent hover:text-[#010125]
                 hover:border-[#010125] duration-300 transition-all"
               >
                 Add Events
-              </button>
+              </Link>
 
               <button
                 className="bg-orange-500 p-2 rounded-full py-3 px-4
