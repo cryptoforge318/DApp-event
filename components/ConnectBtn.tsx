@@ -2,7 +2,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import Image from 'next/image'
 import React from 'react'
 
-const ConnectBtn: React.FC = () => {
+const ConnectBtn: React.FC<{ networks?: boolean }> = ({ networks }) => {
   return (
     <ConnectButton.Custom>
       {({
@@ -47,7 +47,7 @@ const ConnectBtn: React.FC = () => {
                 )
               }
 
-              if (chain.unsupported) {
+              if (chain.unsupported && networks) {
                 return (
                   <button
                     className="bg-transparent border border-orange-500 hover:bg-orange-600
@@ -63,37 +63,39 @@ const ConnectBtn: React.FC = () => {
 
               return (
                 <div style={{ display: 'flex', gap: 12 }}>
-                  <button
-                    onClick={openChainModal}
-                    style={{ display: 'flex', alignItems: 'center' }}
-                    className="bg-transparent border border-orange-500 hover:bg-orange-600
+                  {networks && (
+                    <button
+                      onClick={openChainModal}
+                      style={{ display: 'flex', alignItems: 'center' }}
+                      className="bg-transparent border border-orange-500 hover:bg-orange-600
                     py-2 px-6 text-orange-500 hover:text-white rounded-full
                     transition duration-300 ease-in-out"
-                    type="button"
-                  >
-                    {chain.hasIcon && (
-                      <div
-                        style={{
-                          background: chain.iconBackground,
-                          width: 12,
-                          height: 12,
-                          borderRadius: 999,
-                          overflow: 'hidden',
-                          marginRight: 4,
-                        }}
-                      >
-                        {chain.iconUrl && (
-                          <Image
-                            alt={chain.name ?? 'Chain icon'}
-                            src={chain.iconUrl}
-                            width="12"
-                            height="12"
-                          />
-                        )}
-                      </div>
-                    )}
-                    {chain.name}
-                  </button>
+                      type="button"
+                    >
+                      {chain.hasIcon && (
+                        <div
+                          style={{
+                            background: chain.iconBackground,
+                            width: 12,
+                            height: 12,
+                            borderRadius: 999,
+                            overflow: 'hidden',
+                            marginRight: 4,
+                          }}
+                        >
+                          {chain.iconUrl && (
+                            <Image
+                              alt={chain.name ?? 'Chain icon'}
+                              src={chain.iconUrl}
+                              width="12"
+                              height="12"
+                            />
+                          )}
+                        </div>
+                      )}
+                      {chain.name}
+                    </button>
+                  )}
 
                   <button
                     className="bg-transparent border border-orange-500 hover:bg-orange-600
