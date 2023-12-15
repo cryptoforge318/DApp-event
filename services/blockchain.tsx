@@ -2,6 +2,8 @@ import { ethers } from 'ethers'
 import address from '@/contracts/contractAddress.json'
 import p2eAbi from '@/artifacts/contracts/DappEventX.sol/dappEventX.json'
 import { EventParams, EventStruct, TicketStruct } from '@/utils/type.dt'
+import { globalActions } from '@/store/globalSlices'
+import { store } from '@/store'
 
 const toWei = (num: number) => ethers.parseEther(num.toString())
 const fromWei = (num: number) => ethers.formatEther(num)
@@ -10,6 +12,7 @@ let ethereum: any
 let tx: any
 
 if (typeof window !== 'undefined') ethereum = (window as any).ethereum
+const { setEvent, setTickets } = globalActions
 
 const getEthereumContracts = async () => {
   const accounts = await ethereum?.request?.({ method: 'eth_accounts' })
@@ -101,15 +104,39 @@ const deleteEvent = async (eventId: number): Promise<void> => {
   }
 }
 
-const getOwner = async (): Promise<string> => {
-  const contract = await getEthereumContracts()
-  const owner = await contract.owner()
-  return owner
+const buyTicket = async (event: EventStruct, tickets: number): Promise<void> => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.buyTickets(event.id, tickets, { value: toWei(tickets * event.ticketCost) })
+    await tx.wait()
+
+    const eventData: EventStruct = await getEvent(event.id)
+    store.dispatch(setEvent(eventData))
+
+    const ticketsData: TicketStruct[] = await getTickets(event.id)
+    store.dispatch(setTickets(ticketsData))
+
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
 }
 
 const getEvents = async (): Promise<EventStruct[]> => {
   const contract = await getEthereumContracts()
   const events = await contract.getEvents()
+  return structuredEvent(events)
+}
+
+const getMyEvents = async (): Promise<EventStruct[]> => {
+  const contract = await getEthereumContracts()
+  const events = await contract.getMyEvents()
   return structuredEvent(events)
 }
 
@@ -160,4 +187,13 @@ const structuredTicket = (tickets: TicketStruct[]): TicketStruct[] =>
     }))
     .sort((a, b) => b.timestamp - a.timestamp)
 
-export { getOwner, getEvents, getEvent, getTickets, createEvent, updateEvent, deleteEvent }
+export {
+  getEvents,
+  getMyEvents,
+  getEvent,
+  getTickets,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+  buyTicket,
+}

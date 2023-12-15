@@ -8,11 +8,14 @@ import { useRouter } from 'next/router'
 import { BsDot } from 'react-icons/bs'
 import { FaEthereum, FaRegTrashAlt } from 'react-icons/fa'
 import { deleteEvent, getEvent, getTickets } from '@/services/blockchain'
-import { EventStruct, TicketStruct } from '@/utils/type.dt'
+import { EventStruct, RootState, TicketStruct } from '@/utils/type.dt'
 import { GrEdit } from 'react-icons/gr'
 import { calculateDateDifference, formatDate, getExpiryDate, truncate } from '@/utils/helper'
 import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { globalActions } from '@/store/globalSlices'
 
 interface ComponentProps {
   eventData: EventStruct
@@ -20,8 +23,17 @@ interface ComponentProps {
 }
 
 const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
+  const dispatch = useDispatch()
   const { address } = useAccount()
   const router = useRouter()
+
+  const { event, tickets } = useSelector((states: RootState) => states.globalStates)
+  const { setEvent, setTickets, setTicketModal } = globalActions
+
+  useEffect(() => {
+    dispatch(setEvent(eventData))
+    dispatch(setTickets(ticketsData))
+  }, [dispatch, setEvent, eventData, setTickets, ticketsData])
 
   const handleDelete = async () => {
     if (!address) return toast.warn('Connect wallet first')
@@ -47,10 +59,10 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
     )
   }
 
-  return (
+  return event ? (
     <div>
       <Head>
-        <title>Event X | Page</title>
+        <title>Event X | {event.title}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -60,36 +72,32 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
           flex-col sm:space-x-3"
         >
           <div className="w-full shadow-md sm:shadow-sm">
-            <img
-              src={eventData.imageUrl}
-              alt={eventData.title}
-              className="w-full h-[500px] object-cover"
-            />
+            <img src={event.imageUrl} alt={event.title} className="w-full h-[500px] object-cover" />
           </div>
           <div className="w-full">
-            <h3 className="text-gray-900 text-3xl font-bold mt-4 capitalize ">{eventData.title}</h3>
+            <h3 className="text-gray-900 text-3xl font-bold mt-4 capitalize ">{event.title}</h3>
             <small className="font-medium text-sm">
-              {calculateDateDifference(eventData.startsAt, eventData.endsAt)} event |{' '}
-              {eventData.capacity - eventData.seats} seat(s) left
+              {calculateDateDifference(event.startsAt, event.endsAt)} event |{' '}
+              {event.capacity - event.seats} seat(s) left
             </small>
-            <p className="mt-4">{eventData.description}</p>
+            <p className="mt-4">{event.description}</p>
 
             <div className="flex justify-start items-center my-4 ">
               <div className="flex justify-start items-center">
                 <FaEthereum />
-                <p className=" font-bold">{eventData.ticketCost.toFixed(2)} ETH </p>
+                <p className=" font-bold">{event.ticketCost.toFixed(2)} ETH </p>
               </div>
               <span className="pl-4">|</span>
               <div className="text-lg mx-4">
-                {eventData.startsAt > Date.now() && (
-                  <p className="text-gray-600">Starts on {formatDate(eventData.startsAt)}</p>
+                {event.startsAt > Date.now() && (
+                  <p className="text-gray-600">Starts on {formatDate(event.startsAt)}</p>
                 )}
 
-                {Date.now() > eventData.startsAt && (
-                  <p className="text-orange-500">Ends in {getExpiryDate(eventData.endsAt)} days</p>
+                {Date.now() > event.startsAt && (
+                  <p className="text-orange-500">Ends in {getExpiryDate(event.endsAt)} days</p>
                 )}
 
-                {Date.now() > eventData.endsAt && <p className="text-red-500">Expired</p>}
+                {Date.now() > event.endsAt && <p className="text-red-500">Expired</p>}
               </div>
             </div>
 
@@ -98,14 +106,15 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
                 className="bg-orange-500 p-2 rounded-full py-3 px-10
                 text-white hover:bg-transparent border hover:text-orange-500
                 hover:border-orange-500 duration-300 transition-all"
+                onClick={() => dispatch(setTicketModal('scale-100'))}
               >
                 Buy Ticket
               </button>
 
-              {address === eventData.owner && (
+              {address === event.owner && (
                 <>
                   <Link
-                    href={'/events/edit/' + eventData.id}
+                    href={'/events/edit/' + event.id}
                     className="bg-transparent p-2 rounded-full py-3 px-5
                     text-black hover:bg-orange-500 hover:text-white
                     duration-300 transition-all flex justify-start items-center
@@ -127,8 +136,8 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
               )}
             </div>
 
-            <h4 className="text-xl mt-10 mb-5">Recent Purchase ({ticketsData.length})</h4>
-            {ticketsData.slice(0, 4).map((ticket, i) => (
+            <h4 className="text-xl mt-10 mb-5">Recent Purchase ({tickets.length})</h4>
+            {tickets.slice(0, 4).map((ticket, i) => (
               <div
                 className="flex justify-start items-between space-x-4 w-full py-5 
                 border-b border-gray-200"
@@ -166,7 +175,7 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
 
             <div className="flex justify-start items-center space-x-4 my-8">
               <Link
-                href={'/events/tickets/' + eventData.id}
+                href={'/events/tickets/' + event.id}
                 className="bg-[#010125] p-2 rounded-full py-3 px-10
                 text-white border hover:bg-transparent hover:text-[#010125]
                 hover:border-[#010125] duration-300 transition-all"
@@ -178,8 +187,10 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
         </main>
       </section>
 
-      <BuyTicket />
+      <BuyTicket event={event} />
     </div>
+  ) : (
+    <p>Loading...</p>
   )
 }
 
