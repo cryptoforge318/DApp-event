@@ -1,4 +1,3 @@
-import { buyTicket } from '@/services/blockchain'
 import { globalActions } from '@/store/globalSlices'
 import { EventStruct, RootState } from '@/utils/type.dt'
 import React, { FormEvent, useState } from 'react'
@@ -20,14 +19,8 @@ const BuyTicket: React.FC<{ event: EventStruct }> = ({ event }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        buyTicket(event, Number(tickets))
-          .then((tx) => {
-            dispatch(setTicketModal('scale-0'))
-            setTickets('')
-            console.log(tx)
-            resolve(tx)
-          })
-          .catch((error) => reject(error))
+        console.log(event)
+        resolve(event)
       }),
       {
         pending: 'Approve transaction...',

@@ -8,7 +8,6 @@ import { useAccount } from 'wagmi'
 import { EventStruct } from '@/utils/type.dt'
 import { GrEdit } from 'react-icons/gr'
 import { FiDollarSign } from 'react-icons/fi'
-import { deleteEvent, payout } from '@/services/blockchain'
 import { useRouter } from 'next/router'
 
 const EventActions: React.FC<{ event: EventStruct }> = ({ event }) => {
@@ -23,13 +22,8 @@ const EventActions: React.FC<{ event: EventStruct }> = ({ event }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        deleteEvent(event.id)
-          .then((tx) => {
-            console.log(tx)
-            router.push('/')
-            resolve(tx)
-          })
-          .catch((error) => reject(error))
+        console.log(event)
+        resolve(event)
       }),
       {
         pending: 'Approve transaction...',
@@ -47,12 +41,8 @@ const EventActions: React.FC<{ event: EventStruct }> = ({ event }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        payout(event.id)
-          .then((tx) => {
-            console.log(tx)
-            resolve(tx)
-          })
-          .catch((error) => reject(error))
+        console.log(event)
+        resolve(event)
       }),
       {
         pending: 'Approve transaction...',

@@ -1,4 +1,4 @@
-import { getEvent, updateEvent } from '@/services/blockchain'
+import { generateEventData } from '@/utils/fakeData'
 import { timestampToDatetimeLocal } from '@/utils/helper'
 import { EventParams, EventStruct } from '@/utils/type.dt'
 import { GetServerSidePropsContext, NextPage } from 'next'
@@ -33,12 +33,8 @@ const Page: NextPage<{ eventData: EventStruct }> = ({ eventData }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        updateEvent(event)
-          .then((tx) => {
-            console.log(tx)
-            resolve(tx)
-          })
-          .catch((error) => reject(error))
+        console.log(event)
+        resolve(event)
       }),
       {
         pending: 'Approve transaction...',
@@ -220,7 +216,7 @@ export default Page
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { id } = context.query
-  const eventData: EventStruct = await getEvent(Number(id))
+  const eventData: EventStruct = generateEventData(Number(id))[0]
 
   return {
     props: {
