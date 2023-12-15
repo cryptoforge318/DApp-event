@@ -9,7 +9,7 @@ const Header: React.FC = () => {
     <header className="h-20 shadow-md p-5 sm:px-0 fixed z-50 top-0 right-0 left-0 bg-white">
       <main className="lg:w-2/3 w-full mx-auto flex justify-between items-center flex-wrap">
         <Link href={'/'} className="text-lg font-bold">
-          EventX
+          Event X
         </Link>
         <Desktop />
         <Mobile />

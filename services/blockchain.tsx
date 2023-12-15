@@ -104,6 +104,27 @@ const deleteEvent = async (eventId: number): Promise<void> => {
   }
 }
 
+const payout = async (eventId: number): Promise<void> => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.payout(eventId)
+    await tx.wait()
+
+    const eventData: EventStruct = await getEvent(eventId)
+    store.dispatch(setEvent(eventData))
+
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
 const buyTicket = async (event: EventStruct, tickets: number): Promise<void> => {
   if (!ethereum) {
     reportError('Please install a browser provider')
@@ -196,4 +217,5 @@ export {
   updateEvent,
   deleteEvent,
   buyTicket,
+  payout,
 }
