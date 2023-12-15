@@ -22,7 +22,7 @@ const EventList: React.FC<{ events: EventStruct[] }> = ({ events }) => {
 const Card: React.FC<{ event: EventStruct }> = ({ event }) => {
   return (
     <div className="rounded-lg shadow-lg bg-white max-w-xs">
-      <img src={event.imageUrl} alt={event.title} />
+      <img src={event.imageUrl} alt={event.title} className='h-44 w-full object-cover' />
 
       <div className="p-4">
         <h3 className="text-gray-900 text-lg font-bold mb-2 capitalize">
