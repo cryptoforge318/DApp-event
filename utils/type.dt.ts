@@ -44,13 +44,3 @@ export interface TicketStruct {
   refunded: boolean
   minted: boolean
 }
-
-export interface GlobalState {
-  event: EventStruct | null
-  tickets: TicketStruct[]
-  ticketModal: string
-}
-
-export interface RootState {
-  globalStates: GlobalState
-}
