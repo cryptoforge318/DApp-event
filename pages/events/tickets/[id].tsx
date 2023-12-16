@@ -1,7 +1,5 @@
-import BuyTicket from '@/components/BuyTicket'
 import Ticket from '@/components/Tickets'
 import { getTickets } from '@/services/blockchain'
-import { generateTicketData } from '@/utils/fakeData'
 import { TicketStruct } from '@/utils/type.dt'
 import { GetServerSidePropsContext, NextPage } from 'next'
 import Head from 'next/head'
@@ -23,14 +21,6 @@ const Page: NextPage<{ ticketsData: TicketStruct[] }> = ({ ticketsData }) => {
         <Ticket tickets={ticketsData} />
 
         <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start space-x-2">
-          <button
-            className="bg-orange-500 p-2 rounded-full py-3 px-10
-            text-white hover:bg-transparent border hover:text-orange-500
-            hover:border-orange-500 duration-300 transition-all"
-          >
-            Buy Ticket
-          </button>
-
           <Link
             href={'/events/' + id}
             className="bg-[#010125] p-2 rounded-full py-3 px-10
@@ -41,8 +31,6 @@ const Page: NextPage<{ ticketsData: TicketStruct[] }> = ({ ticketsData }) => {
           </Link>
         </div>
       </section>
-
-      <BuyTicket />
     </div>
   )
 }
