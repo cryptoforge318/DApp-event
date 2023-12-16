@@ -3,7 +3,7 @@ const { ethers } = require('hardhat')
 const fs = require('fs')
 
 const toWei = (num) => ethers.parseEther(num.toString())
-const dataCount = 5
+const dataCount = 1
 
 const generateEventData = (count) => {
   const events = []
@@ -62,6 +62,8 @@ async function getTickets(contract, eventId) {
   console.log('Tickets:', result)
 }
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 async function main() {
   let dappEventXContract
 
@@ -71,24 +73,37 @@ async function main() {
 
     dappEventXContract = await ethers.getContractAt('DappEventX', dappEventXAddress)
 
-    // generateEventData(dataCount).forEach(async (event) => {
-    //   await createEvent(dappEventXContract, event)
-    // })
+    // Process #1
+    await Promise.all(
+      generateEventData(dataCount).map(async (event) => {
+        await createEvent(dappEventXContract, event)
+      })
+    )
 
-    // Array(dataCount)
-    //   .fill()
-    //   .forEach(async (event, i) => {
-    //     const randomCount = faker.number.int({ min: 1, max: 4 })
+    await delay(2500) // Wait for 2.5 seconds
 
-    //     Array(randomCount)
-    //       .fill()
-    //       .forEach(async (_, j) => {
-    //         await buyTickets(dappEventXContract, i + 1, 1)
-    //       })
-    //   })
+    // Process #2
+    await Promise.all(
+      Array(dataCount)
+        .fill()
+        .map(async (_, i) => {
+          const randomCount = faker.number.int({ min: 1, max: 2 })
 
-    // await getEvents(dappEventXContract)
-    // await getTickets(dappEventXContract, 1)
+          await Promise.all(
+            Array(randomCount)
+              .fill()
+              .map(async () => {
+                await buyTickets(dappEventXContract, i + 1, 1)
+              })
+          )
+        })
+    )
+
+    await delay(2500) // Wait for 2.5 seconds
+
+    // Process #3
+    await getEvents(dappEventXContract)
+    await getTickets(dappEventXContract, 1)
   } catch (error) {
     console.error('Unhandled error:', error)
   }
