@@ -24,7 +24,7 @@ const bitfinity: Chain = {
   name: 'Bitfinity',
   network: 'bitfinity',
   iconUrl: 'https://bitfinity.network/logo.png',
-  iconBackground: '#000',
+  iconBackground: '#000000',
   nativeCurrency: {
     decimals: 18,
     name: 'Bitfinity',
