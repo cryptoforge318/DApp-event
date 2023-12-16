@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import address from '@/contracts/contractAddress.json'
-import p2eAbi from '@/artifacts/contracts/DappEventX.sol/dappEventX.json'
+import abi from '@/artifacts/contracts/DappEventX.sol/DappEventX.json'
 import { EventParams, EventStruct, TicketStruct } from '@/utils/type.dt'
 import { globalActions } from '@/store/globalSlices'
 import { store } from '@/store'
@@ -20,14 +20,14 @@ const getEthereumContracts = async () => {
   if (accounts?.length > 0) {
     const provider = new ethers.BrowserProvider(ethereum)
     const signer = await provider.getSigner()
-    const contracts = new ethers.Contract(address.dappEventXContract, p2eAbi.abi, signer)
+    const contracts = new ethers.Contract(address.dappEventXContract, abi.abi, signer)
 
     return contracts
   } else {
     const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)
     const wallet = ethers.Wallet.createRandom()
     const signer = wallet.connect(provider)
-    const contracts = new ethers.Contract(address.dappEventXContract, p2eAbi.abi, signer)
+    const contracts = new ethers.Contract(address.dappEventXContract, abi.abi, signer)
 
     return contracts
   }
