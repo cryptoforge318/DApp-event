@@ -4,7 +4,7 @@ import React from 'react'
 const Hero: React.FC = () => {
   return (
     <main className="lg:w-2/3 w-full mx-auto relative shadow-md px-5 py-7 bg-white">
-      <div className="relative pb-8 ">
+      <div className="relative pb-5 bg-white lg:z-10 lg:w-2/3">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="sm:text-center lg:text-left">
             <h1 className="text-4xl tracking-tight font-bold text-gray-900 sm:text-5xl sm:tracking-tight md:text-6xl md:tracking-tight">
