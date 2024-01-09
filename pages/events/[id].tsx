@@ -10,10 +10,10 @@ import { EventStruct, RootState, TicketStruct } from '@/utils/type.dt'
 import { calculateDateDifference, formatDate, getExpiryDate, truncate } from '@/utils/helper'
 import { useAccount } from 'wagmi'
 import EventActions from '@/components/EventAction'
-import { generateEventData, generateTicketData } from '@/utils/fakeData'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { globalActions } from '@/store/globalSlices'
+import { getEvent, getTickets } from '@/services/blockchain'
 
 interface ComponentProps {
   eventData: EventStruct
@@ -23,7 +23,7 @@ interface ComponentProps {
 const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
   const { address } = useAccount()
   const dispatch = useDispatch()
-  const { setEvent, setTickets } = globalActions
+  const { setEvent, setTickets, setTicketModal } = globalActions
   const { event, tickets } = useSelector((states: RootState) => states.globalStates)
 
   useEffect(() => {
@@ -91,6 +91,7 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
             <div className="flex justify-start items-center space-x-4 my-8">
               {event.endsAt > Date.now() && (
                 <button
+                  onClick={() => dispatch(setTicketModal('scale-100'))}
                   className="bg-orange-500 p-2 rounded-full py-3 px-10
                 text-white hover:bg-transparent border hover:text-orange-500
                 hover:border-orange-500 duration-300 transition-all"
@@ -99,7 +100,7 @@ const Page: NextPage<ComponentProps> = ({ eventData, ticketsData }) => {
                 </button>
               )}
 
-              {address === event.owner && <EventActions event={event} />}
+              {address === event.owner && !event.paidOut && <EventActions event={event} />}
             </div>
 
             <h4 className="text-xl mt-10 mb-5">Recent Purchase ({tickets.length})</h4>
@@ -164,8 +165,8 @@ export default Page
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { id } = context.query
-  const eventData: EventStruct = generateEventData(Number(id))[0]
-  const ticketsData: TicketStruct[] = generateTicketData(5)
+  const eventData: EventStruct = await getEvent(Number(id))
+  const ticketsData: TicketStruct[] = await getTickets(Number(id))
 
   return {
     props: {

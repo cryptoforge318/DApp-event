@@ -1,5 +1,5 @@
 import Ticket from '@/components/Tickets'
-import { generateTicketData } from '@/utils/fakeData'
+import { getTickets } from '@/services/blockchain'
 import { TicketStruct } from '@/utils/type.dt'
 import { GetServerSidePropsContext, NextPage } from 'next'
 import Head from 'next/head'
@@ -39,7 +39,7 @@ export default Page
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { id } = context.query
-  const ticketsData: TicketStruct[] = generateTicketData(7)
+  const ticketsData: TicketStruct[] = await getTickets(Number(id))
 
   return {
     props: {

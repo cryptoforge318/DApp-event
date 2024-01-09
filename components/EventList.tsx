@@ -24,13 +24,13 @@ const Card: React.FC<{ event: EventStruct }> = ({ event }) => {
     <Link href={'/events/' + event.id} className="rounded-lg shadow-lg bg-white max-w-xs">
       <div className="relative">
         <img src={event.imageUrl} alt={event.title} className="h-44 w-full object-cover" />
-        {!event.minted ? (
+        {!event.paidOut ? (
           <span className="bg-orange-600 text-white absolute right-3 top-3 rounded-xl px-4">
             Open
           </span>
         ) : (
           <span className="bg-cyan-600 text-white absolute right-3 top-3 rounded-xl px-4">
-            Minted
+            Paid
           </span>
         )}
       </div>

@@ -1,12 +1,17 @@
-import { EventStruct } from '@/utils/type.dt'
+import { buyTickets } from '@/services/blockchain'
+import { globalActions } from '@/store/globalSlices'
+import { EventStruct, RootState } from '@/utils/type.dt'
 import React, { FormEvent, useState } from 'react'
 import { FaTimes } from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { useAccount } from 'wagmi'
 
 const BuyTicket: React.FC<{ event: EventStruct }> = ({ event }) => {
-  const ticketModal = 'scale-0'
+  const { ticketModal } = useSelector((states: RootState) => states.globalStates)
   const { address } = useAccount()
+  const dispatch = useDispatch()
+  const { setTicketModal } = globalActions
   const [tickets, setTickets] = useState<number | string>('')
 
   const handleSubmit = async (e: FormEvent) => {
@@ -15,8 +20,13 @@ const BuyTicket: React.FC<{ event: EventStruct }> = ({ event }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        console.log(event)
-        resolve(event)
+        buyTickets(event, Number(tickets))
+          .then((tx) => {
+            console.log(tx)
+            onClose()
+            resolve(tx)
+          })
+          .catch((error) => reject(error))
       }),
       {
         pending: 'Approve transaction...',
@@ -24,6 +34,11 @@ const BuyTicket: React.FC<{ event: EventStruct }> = ({ event }) => {
         error: 'Encountered error 🤯',
       }
     )
+  }
+
+  const onClose = () => {
+    dispatch(setTicketModal('scale-0'))
+    setTickets('')
   }
 
   return (
@@ -35,9 +50,7 @@ const BuyTicket: React.FC<{ event: EventStruct }> = ({ event }) => {
         <div className="flex flex-col">
           <div className="flex flex-row justify-between items-center">
             <p className="font-semibold">Buy Tickets</p>
-            <button
-              className="border-0 bg-transparent focus:outline-none"
-            >
+            <button onClick={onClose} className="border-0 bg-transparent focus:outline-none">
               <FaTimes />
             </button>
           </div>
@@ -52,10 +65,11 @@ const BuyTicket: React.FC<{ event: EventStruct }> = ({ event }) => {
                   className="block w-full text-sm bg-transparent
                   border-0 focus:outline-none focus:ring-0"
                   type="number"
-                  step="1"
-                  min="1"
+                  step={1}
+                  min={1}
+                  max={3}
                   name="tickets"
-                  placeholder="Ticket e.g 3"
+                  placeholder="Ticket e.g (1 - 3)"
                   value={tickets}
                   onChange={(e) => setTickets(e.target.value)}
                   required

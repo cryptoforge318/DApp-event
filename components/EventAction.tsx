@@ -9,6 +9,7 @@ import { EventStruct } from '@/utils/type.dt'
 import { GrEdit } from 'react-icons/gr'
 import { FiDollarSign } from 'react-icons/fi'
 import { useRouter } from 'next/router'
+import { deleteEvent, payout } from '@/services/blockchain'
 
 const EventActions: React.FC<{ event: EventStruct }> = ({ event }) => {
   const { address } = useAccount()
@@ -22,8 +23,13 @@ const EventActions: React.FC<{ event: EventStruct }> = ({ event }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        console.log(event)
-        resolve(event)
+        deleteEvent(event.id)
+          .then((tx) => {
+            console.log(tx)
+            router.push('/')
+            resolve(tx)
+          })
+          .catch((error) => reject(error))
       }),
       {
         pending: 'Approve transaction...',
@@ -41,8 +47,12 @@ const EventActions: React.FC<{ event: EventStruct }> = ({ event }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        console.log(event)
-        resolve(event)
+        payout(event.id)
+          .then((tx) => {
+            console.log(tx)
+            resolve(tx)
+          })
+          .catch((error) => reject(error))
       }),
       {
         pending: 'Approve transaction...',
@@ -82,32 +92,36 @@ const EventActions: React.FC<{ event: EventStruct }> = ({ event }) => {
                 </Link>
               )}
             </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  className={`flex justify-start items-center space-x-1 ${
-                    active ? 'bg-green-700' : 'text-green-700'
-                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                  onClick={handlePayout}
-                >
-                  <FiDollarSign size={17} />
-                  <span>Payout</span>
-                </button>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  className={`flex justify-start items-center space-x-1 ${
-                    active ? 'bg-red-700' : 'text-red-700'
-                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                  onClick={handleDelete}
-                >
-                  <BsTrash3 size={17} />
-                  <span>Delete</span>
-                </button>
-              )}
-            </Menu.Item>
+            {Date.now() > event.endsAt && (
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    className={`flex justify-start items-center space-x-1 ${
+                      active ? 'bg-green-700' : 'text-green-700'
+                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    onClick={handlePayout}
+                  >
+                    <FiDollarSign size={17} />
+                    <span>Payout</span>
+                  </button>
+                )}
+              </Menu.Item>
+            )}
+            {!event.paidOut && (
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    className={`flex justify-start items-center space-x-1 ${
+                      active ? 'bg-red-700' : 'text-red-700'
+                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    onClick={handleDelete}
+                  >
+                    <BsTrash3 size={17} />
+                    <span>Delete</span>
+                  </button>
+                )}
+              </Menu.Item>
+            )}
           </>
         )}
       </Menu.Items>

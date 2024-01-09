@@ -1,3 +1,4 @@
+import { createEvent } from '@/services/blockchain'
 import { EventParams } from '@/utils/type.dt'
 import { NextPage } from 'next'
 import Head from 'next/head'
@@ -33,9 +34,14 @@ const Page: NextPage = () => {
     event.endsAt = new Date(event.endsAt).getTime()
 
     await toast.promise(
-      new Promise(async (resolve, reject) => {
-        console.log(event)
-        resolve(event)
+      new Promise((resolve, reject) => {
+        createEvent(event)
+          .then((tx) => {
+            console.log(tx)
+            resetForm()
+            resolve(tx)
+          })
+          .catch((error) => reject(error))
       }),
       {
         pending: 'Approve transaction...',

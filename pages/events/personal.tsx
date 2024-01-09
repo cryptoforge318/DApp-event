@@ -1,5 +1,5 @@
 import EventList from '@/components/EventList'
-import { generateEventData } from '@/utils/fakeData'
+import { getMyEvents } from '@/services/blockchain'
 import { EventStruct } from '@/utils/type.dt'
 import { NextPage } from 'next'
 import Head from 'next/head'
@@ -17,7 +17,7 @@ const Page: NextPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const events: EventStruct[] = generateEventData(10)
+      const events: EventStruct[] = await getMyEvents()
       setEvents(events)
     }
 
